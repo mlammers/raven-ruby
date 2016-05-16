@@ -14,7 +14,7 @@ module Raven
 
     def self.parse_exception(message)
       lines = message.split(/\n\s*/)
-      # TODO wat
+      # TODO: wat
       return nil unless lines.length > 2
 
       match = lines[0].match(EXC_FORMAT)

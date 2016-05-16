@@ -26,6 +26,8 @@ end
 
 module Raven
   class BreadcrumbBuffer
+    include Enumerable
+
     def self.current
       Thread.current[:sentry_breadcrumbs] ||= new
     end
@@ -35,9 +37,6 @@ module Raven
     end
 
     def initialize(size = 100)
-      @count = 0
-      @pos = 0
-      @size = size
       @buffer = Array.new(size)
     end
 
@@ -46,29 +45,29 @@ module Raven
         crumb = Breadcrumb.new if crumb.nil?
         yield(crumb)
       end
-      @buffer[@pos] = crumb
-      @pos = (@pos + 1) % @size
-      @count += 1
+      @buffer.slice!(0)
+      @buffer << crumb
+    end
+
+    def members
+      @buffer.compact
     end
 
     def peek
-      @buffer[@pos - 1]
+      members.last
     end
 
-    def each
-      (0..(@size - 1)).each_with_object([]) do |i, results|
-        node = @buffer[(@pos + i) % @size]
-        results << node unless node.nil?
-      end
+    def each(&block)
+      members.each(&block)
     end
 
     def empty?
-      @count == 0
+      !members.any?
     end
 
     def to_hash
       {
-        :values => each.map(&:to_hash)
+        :values => members.map(&:to_hash)
       }
     end
   end
