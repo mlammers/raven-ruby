@@ -56,12 +56,10 @@ module Raven
     end
 
     def each
-      results = []
-      (0..(@size - 1)).each do |i|
+      (0..(@size - 1)).each_with_object([]) do |i, results|
         node = @buffer[(@pos + i) % @size]
-        results.push(node) unless node.nil?
+        results << node unless node.nil?
       end
-      results
     end
 
     def empty?

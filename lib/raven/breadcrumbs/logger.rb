@@ -14,6 +14,7 @@ module Raven
 
     def self.parse_exception(message)
       lines = message.split(/\n\s*/)
+      # TODO wat
       return nil unless lines.length > 2
 
       match = lines[0].match(EXC_FORMAT)
@@ -24,23 +25,7 @@ module Raven
     end
 
     def add(severity, message = nil, progname = nil, &block)
-      # This is pulled in from Logger:add, and is needed due to the
-      # way logger's internal syntax works
-      severity ||= UNKNOWN
-      progname ||= self.progname
-      if message.nil?
-        if block_given?
-          message = yield
-        else
-          message = progname
-          progname = self.progname
-        end
-      end
-
-      super
-
       return if progname == "sentry" || Raven.configuration.exclude_loggers.include?(progname)
-
       return if message.nil? || message == ""
 
       # some loggers will add leading/trailing space as they (incorrectly, mind you)
@@ -65,11 +50,13 @@ module Raven
         else
           Raven.breadcrumbs.record do |crumb|
             crumb.level = Raven::BreadcrumbLogger::LEVELS.fetch(severity, nil)
-            crumb.message = message
             crumb.category = progname || 'logger'
+            crumb.message = message
           end
         end
       end
+
+      super
     end
   end
 end

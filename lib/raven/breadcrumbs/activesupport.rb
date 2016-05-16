@@ -1,12 +1,11 @@
 module Raven
   module ActiveSupportBreadcrumbs
     class << self
-        def add(name, _started, _finished, _unique_id, data)
+        def add(name, started, _finished, _unique_id, data)
           Raven.breadcrumbs.record do |crumb|
             crumb.data = data
             crumb.category = name
-            # TODO(dcramer): coerce started into unix timestamp or UTC iso
-            # crumb.timestamp = started
+            crumb.timestamp = started.to_i
           end
         end
 
