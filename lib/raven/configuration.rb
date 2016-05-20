@@ -208,6 +208,8 @@ module Raven
     end
 
     def send_in_current_environment?
+      require 'pry'
+      binding.pry
       !!server && (environments.empty? || environments.include?(current_environment))
     end
 
