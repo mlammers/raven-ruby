@@ -208,8 +208,10 @@ module Raven
     end
 
     def send_in_current_environment?
-      require 'pry'
-      binding.pry
+      Rails.logger.info server
+      Rails.logger.info environments
+      Rails.logger.info current_environment
+  
       !!server && (environments.empty? || environments.include?(current_environment))
     end
 
