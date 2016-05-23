@@ -211,7 +211,7 @@ module Raven
       p server
       p environments
       p current_environment
-  
+      p self.inspect 
       !!server && (environments.empty? || environments.include?(current_environment))
     end
 
